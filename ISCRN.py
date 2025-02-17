@@ -6,9 +6,9 @@ import torch.nn.functional as F
 from nnstruct.s4d import S4D
 
 
-class CFB(nn.Module):
+class SCB(nn.Module):
     def __init__(self, in_channels=None, out_channels=None):
-        super(CFB, self).__init__()
+        super(SCB, self).__init__()
         self.conv_gate = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(1, 1), stride=1,
                                    padding=(0, 0), dilation=1, groups=1, bias=True)
         self.conv_input = nn.Conv2d(in_channels=in_channels, out_channels=out_channels, kernel_size=(1, 1), stride=1,
@@ -76,20 +76,20 @@ class NET(nn.Module):
 
         self.in_ch_lstm = CH_LSTM_F(14, channels, channels)
         self.in_conv = nn.Conv2d(in_channels=14 + channels, out_channels=channels, kernel_size=(1, 1))
-        self.cfb_e1 = CFB(channels, channels)
-        self.cfb_e2 = CFB(channels, channels)
-        self.cfb_e3 = CFB(channels, channels)
-        self.cfb_e4 = CFB(channels, channels)
-        self.cfb_e5 = CFB(channels, channels)
+        self.cfb_e1 = SCB(channels, channels)
+        self.cfb_e2 = SCB(channels, channels)
+        self.cfb_e3 = SCB(channels, channels)
+        self.cfb_e4 = SCB(channels, channels)
+        self.cfb_e5 = SCB(channels, channels)
 
         self.ln = LayerNorm(channels, 161)
         self.ch_lstm = CH_LSTM_T(in_ch=channels, feat_ch=channels * 2, out_ch=channels, bi=True, num_layers=2)
 
-        self.cfb_d5 = CFB(1 * channels, channels)
-        self.cfb_d4 = CFB(2 * channels, channels)
-        self.cfb_d3 = CFB(2 * channels, channels)
-        self.cfb_d2 = CFB(2 * channels, channels)
-        self.cfb_d1 = CFB(2 * channels, channels)
+        self.cfb_d5 = SCB(1 * channels, channels)
+        self.cfb_d4 = SCB(2 * channels, channels)
+        self.cfb_d3 = SCB(2 * channels, channels)
+        self.cfb_d2 = SCB(2 * channels, channels)
+        self.cfb_d1 = SCB(2 * channels, channels)
 
         self.out_ch_lstm = CH_LSTM_T(2 * channels, channels, channels * 2)
         self.out_conv = nn.Conv2d(in_channels=channels * 3, out_channels=2, kernel_size=(1, 1), padding=(0, 0),
@@ -185,7 +185,7 @@ def complexity():
     mac, param = get_model_complexity_info(model, (14, 100, 161), as_strings=True, print_per_layer_stat=True, verbose=True)
     print(mac, param)
     '''
-    3.07 GMac + 0.57 = 3.64 GMac 950.8 k  ICCRN_channelS4  +0.5722
+    3.07 GMac + 0.57 = 3.64 GMac 950.8 k  
     '''
 
 
